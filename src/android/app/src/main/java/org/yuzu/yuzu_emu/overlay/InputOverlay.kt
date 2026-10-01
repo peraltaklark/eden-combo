@@ -817,9 +817,9 @@ class InputOverlay(context: Context, attrs: AttributeSet?) :
             val comboData = OverlayControlData(
                 id = "combo_$comboIndex",
                 enabled = true,
-                landscapePosition = Pair(0.86 - comboIndex * 0.07, 0.28),
-                portraitPosition = Pair(0.18 + comboIndex * 0.11, 0.92),
-                foldablePosition = Pair(0.18 + comboIndex * 0.11, 0.92),
+                landscapePosition = Pair(0.32 + comboIndex * 0.09, 0.82),
+                portraitPosition = Pair(0.20 + comboIndex * 0.15, 0.86),
+                foldablePosition = Pair(0.20 + comboIndex * 0.15, 0.86),
                 individualScale = 1.0f
             )
             val position = comboData.positionFromLayout(layout)
