@@ -1887,4 +1887,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     <string name="add_folders">Add Folder</string>
     <string name="percent">%1$d%%</string>
 
+
+    <string name="combo_button_settings">Configure Combo Buttons</string>
+    <string name="combo_button_settings_description">Choose what buttons each combo button triggers.</string>
+    <string name="combo_button_1">Combo Button 1</string>
+    <string name="combo_button_2">Combo Button 2</string>
+    <string name="combo_button_3">Combo Button 3</string>
+    <string name="combo_button_4">Combo Button 4</string>
+    <string name="combo_button_5">Combo Button 5</string>
+    <string name="combo_action">Action</string>
+    <string name="combo_button_n">Combo Button %1$d</string>
 </resources>

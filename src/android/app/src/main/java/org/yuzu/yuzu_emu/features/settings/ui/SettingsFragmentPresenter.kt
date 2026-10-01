@@ -610,6 +610,21 @@ class SettingsFragmentPresenter(
                     }
                 )
             )
+
+            add(
+                RunnableSetting(
+                    titleId = R.string.combo_button_settings,
+                    descriptionId = R.string.combo_button_settings_description,
+                    isRunnable = true
+                ) {
+                    activity?.supportFragmentManager?.let { fm ->
+                        ComboButtonConfigDialogFragment().show(
+                            fm,
+                            ComboButtonConfigDialogFragment.TAG
+                        )
+                    }
+                }
+            )
             add(HeaderSetting(R.string.input_overlay_behavior))
             add(BooleanSetting.ENABLE_INPUT_OVERLAY_AUTO_HIDE.key)
             add(IntSetting.INPUT_OVERLAY_AUTO_HIDE.key)

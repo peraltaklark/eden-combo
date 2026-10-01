@@ -45,6 +45,7 @@ import org.yuzu.yuzu_emu.overlay.model.OverlayControl
 import org.yuzu.yuzu_emu.overlay.model.OverlayControlData
 import org.yuzu.yuzu_emu.overlay.model.OverlayLayout
 import org.yuzu.yuzu_emu.utils.NativeConfig
+import org.yuzu.yuzu_emu.utils.ComboHelper
 
 /**
  * Draws the interactive input overlay on top of the
@@ -242,11 +243,15 @@ class InputOverlay(context: Context, attrs: AttributeSet?) :
             if (!button.updateStatus(event)) {
                 continue
             }
-            NativeInput.onOverlayButtonEvent(
-                playerIndex,
-                button.button,
-                button.status
-            )
+            if (button.comboIndex >= 0) {
+                ComboHelper.comboActivate(context, playerIndex, button.status, button.comboIndex)
+            } else {
+                NativeInput.onOverlayButtonEvent(
+                    playerIndex,
+                    button.button,
+                    button.status
+                )
+            }
             playHaptics(event)
             shouldUpdateView = true
         }
@@ -791,6 +796,46 @@ class InputOverlay(context: Context, attrs: AttributeSet?) :
                 }
             }
         }
+
+        // Combo buttons (ported from Azahar)
+        val comboDrawables = intArrayOf(
+            R.drawable.facebutton_combo_1,
+            R.drawable.facebutton_combo_2,
+            R.drawable.facebutton_combo_3,
+            R.drawable.facebutton_combo_4,
+            R.drawable.facebutton_combo_5
+        )
+        val comboDrawablesPressed = intArrayOf(
+            R.drawable.facebutton_combo_1_depressed,
+            R.drawable.facebutton_combo_2_depressed,
+            R.drawable.facebutton_combo_3_depressed,
+            R.drawable.facebutton_combo_4_depressed,
+            R.drawable.facebutton_combo_5_depressed
+        )
+        for (comboIndex in 0 until ComboHelper.COMBO_COUNT) {
+            if (!ComboHelper.isEnabled(context, comboIndex)) continue
+            val comboData = OverlayControlData(
+                id = "combo_$comboIndex",
+                enabled = true,
+                landscapePosition = Pair(0.86 - comboIndex * 0.07, 0.28),
+                portraitPosition = Pair(0.18 + comboIndex * 0.11, 0.92),
+                foldablePosition = Pair(0.18 + comboIndex * 0.11, 0.92),
+                individualScale = 1.0f
+            )
+            val position = comboData.positionFromLayout(layout)
+            overlayButtons.add(
+                initializeOverlayButton(
+                    context,
+                    windowSize,
+                    comboDrawables[comboIndex],
+                    comboDrawablesPressed[comboIndex],
+                    NativeButton.A,
+                    comboData,
+                    position,
+                    comboIndex
+                )
+            )
+        }
     }
 
     fun refreshControls(gameless: Boolean = false) {
@@ -1149,7 +1194,8 @@ class InputOverlay(context: Context, attrs: AttributeSet?) :
             pressedResId: Int,
             button: NativeButton,
             overlayControlData: OverlayControlData,
-            position: Pair<Double, Double>
+            position: Pair<Double, Double>,
+            comboIndex: Int = -1
         ): InputOverlayDrawableButton {
             // Resources handle for fetching the initial Drawable resource.
             val res = context.resources
@@ -1185,7 +1231,8 @@ class InputOverlay(context: Context, attrs: AttributeSet?) :
                 defaultStateBitmap,
                 pressedStateBitmap,
                 button,
-                overlayControlData
+                overlayControlData,
+                comboIndex
             )
 
             // Get the minimum and maximum coordinates of the screen where the button can be placed.

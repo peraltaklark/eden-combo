@@ -66,3 +66,6 @@ vulkansdk*.exe
 
 # Build-time generated external sources
 externals/generated
+
+# Local backups
+src/android/app/src/main/java/org/yuzu/yuzu_emu/overlay/*.bak
