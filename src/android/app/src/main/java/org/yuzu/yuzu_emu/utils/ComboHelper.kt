@@ -56,8 +56,9 @@ object ComboHelper {
 
     fun isEnabled(context: Context, index: Int): Boolean {
         if (index < 0 || index >= COMBO_COUNT) return false
+        // Combos 1-3 enabled by default, 4-5 need manual enable
         return PreferenceManager.getDefaultSharedPreferences(context)
-            .getBoolean(KEY_ENABLED + index, true)
+            .getBoolean(KEY_ENABLED + index, index < 3)
     }
 
     fun setEnabled(context: Context, index: Int, enabled: Boolean) {

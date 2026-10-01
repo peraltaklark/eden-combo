@@ -94,6 +94,7 @@ import org.yuzu.yuzu_emu.utils.InputHandler
 import org.yuzu.yuzu_emu.utils.Log
 import org.yuzu.yuzu_emu.utils.LosslessScalingHelper
 import org.yuzu.yuzu_emu.utils.NativeConfig
+import org.yuzu.yuzu_emu.utils.ComboHelper
 import org.yuzu.yuzu_emu.utils.NativeFreedrenoConfig
 import org.yuzu.yuzu_emu.utils.NativePostProcessing
 import org.yuzu.yuzu_emu.utils.ViewUtils
@@ -2073,22 +2074,42 @@ class EmulationFragment : Fragment(), SurfaceHolder.Callback {
 
                 R.id.menu_toggle_controls -> {
                     val overlayControlData = NativeConfig.getOverlayControlData()
-                    val optionsArray = BooleanArray(overlayControlData.size)
-                    overlayControlData.forEachIndexed { i, _ ->
-                        optionsArray[i] = overlayControlData.firstOrNull { data ->
-                            OverlayControl.entries[i].id == data.id
-                        }?.enabled == true
+                    val nativeCount = OverlayControl.entries.size
+                    val comboCount = ComboHelper.COMBO_COUNT
+                    val totalCount = nativeCount + comboCount
+
+                    // Load the base label array from resources, then append combo labels
+                    val baseLabels = resources.getStringArray(R.array.gamepadButtons)
+                    val labels = Array<CharSequence>(totalCount) { i ->
+                        if (i < nativeCount && i < baseLabels.size) baseLabels[i]
+                        else "Combo ${i - nativeCount + 1}"
+                    }
+
+                    // Build initial checked state: native from config, combo from SharedPreferences
+                    val checkedArray = BooleanArray(totalCount) { i ->
+                        if (i < nativeCount) {
+                            overlayControlData.firstOrNull { data ->
+                                OverlayControl.entries[i].id == data.id
+                            }?.enabled == true
+                        } else {
+                            ComboHelper.isEnabled(requireContext(), i - nativeCount)
+                        }
                     }
 
                     val dialog = MaterialAlertDialogBuilder(requireContext())
                         .setTitle(R.string.emulation_toggle_controls)
-                        .setMultiChoiceItems(
-                            R.array.gamepadButtons,
-                            optionsArray
-                        ) { _, indexSelected, isChecked ->
-                            overlayControlData.firstOrNull { data ->
-                                OverlayControl.entries[indexSelected].id == data.id
-                            }?.enabled = isChecked
+                        .setMultiChoiceItems(labels, checkedArray) { _, indexSelected, isChecked ->
+                            if (indexSelected < nativeCount) {
+                                overlayControlData.firstOrNull { data ->
+                                    OverlayControl.entries[indexSelected].id == data.id
+                                }?.enabled = isChecked
+                            } else {
+                                ComboHelper.setEnabled(
+                                    requireContext(),
+                                    indexSelected - nativeCount,
+                                    isChecked
+                                )
+                            }
                         }
                         .setPositiveButton(android.R.string.ok) { _, _ ->
                             NativeConfig.setOverlayControlData(overlayControlData)
@@ -2102,11 +2123,17 @@ class EmulationFragment : Fragment(), SurfaceHolder.Callback {
                     // Override normal behaviour so the dialog doesn't close
                     dialog.getButton(AlertDialog.BUTTON_NEUTRAL)
                         .setOnClickListener {
-                            val isChecked = !optionsArray[0]
-                            overlayControlData.forEachIndexed { i, _ ->
-                                optionsArray[i] = isChecked
+                            val isChecked = !checkedArray[0]
+                            for (i in 0 until nativeCount) {
+                                checkedArray[i] = isChecked
                                 dialog.listView.setItemChecked(i, isChecked)
                                 overlayControlData[i].enabled = isChecked
+                            }
+                            for (i in 0 until comboCount) {
+                                val idx = nativeCount + i
+                                checkedArray[idx] = isChecked
+                                dialog.listView.setItemChecked(idx, isChecked)
+                                ComboHelper.setEnabled(requireContext(), i, isChecked)
                             }
                         }
                     true

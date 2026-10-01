@@ -17,6 +17,7 @@
             </gradient>
         </aapt:attr>
     </path>
-    <path android:fillAlpha="0.6" android:fillColor="#FF000000"
-        android:pathData="M49.88,34.36h4.29L69.1,69.25L63.58,69.25l-3.5,-8.63L43.48,60.62L40,69.25L34.51,69.25ZM58.36,56.48 L51.85,40.48h-0.1l-6.6,16Z" android:strokeAlpha="0.6"/>
+    <path android:strokeAlpha="0.6" android:strokeColor="#FF000000"
+        android:strokeWidth="6.4" android:strokeLineCap="butt" android:strokeLineJoin="round"
+        android:pathData="M60.5,37.4L45,37.4L43.5,51C45.5,49.3 48,48.5 51,48.5C57,48.5 61.5,51.5 61.5,57.5C61.5,63 57.5,66.05 51.5,66.05C47,66.05 43.5,64.3 41.8,60.5"/>
 </vector>

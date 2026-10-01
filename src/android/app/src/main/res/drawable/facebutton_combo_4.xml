@@ -18,5 +18,5 @@
         </aapt:attr>
     </path>
     <path android:fillAlpha="0.6" android:fillColor="#FF000000"
-        android:pathData="M49.88,34.36h4.29L69.1,69.25L63.58,69.25l-3.5,-8.63L43.48,60.62L40,69.25L34.51,69.25ZM58.36,56.48 L51.85,40.48h-0.1l-6.6,16Z" android:strokeAlpha="0.6"/>
+        android:pathData="M56.2,34.36L56.2,53L62,53L62,58.6L56.2,58.6L56.2,69.25L49.6,69.25L49.6,58.6L37,58.6L37,53.7ZM49.6,47.4L44,53L49.6,53Z" android:strokeAlpha="0.6"/>
 </vector>
