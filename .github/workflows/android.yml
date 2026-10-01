@@ -25,7 +25,7 @@ on:
       build_type:
         description: 'Build type'
         required: true
-        default: 'Debug'
+        default: 'Release'
         type: choice
         options:
           - Debug
@@ -79,15 +79,18 @@ jobs:
       - name: Cache ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
-          key: android-standard-Debug
+          key: android-standard-Release
           max-size: 2G
 
       - name: Build
         env:
           FLAVOR: standard
-          TYPE: Debug
-          CCACHE: 'true'
+          TYPE: Release
+          CCACHE: 'false'
           GIT_TAG_NAME: ${{ github.ref_name }}
+          ANDROID_KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+          ANDROID_KEYSTORE_PASS: ${{ secrets.ANDROID_KEYSTORE_PASS }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
         run: |
           chmod +x .ci/android/build.sh
           ./.ci/android/build.sh -t "$FLAVOR" -b "$TYPE"
