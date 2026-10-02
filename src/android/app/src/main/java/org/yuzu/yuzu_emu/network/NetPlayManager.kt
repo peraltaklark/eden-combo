@@ -208,9 +208,10 @@ object NetPlayManager {
             }
         }
 
-        // Toast only system messages (not chat), and only when the chat dialog
-        // is closed. Chat messages are shown in the overlay / dialog instead.
-        if (type != NetPlayStatus.CHAT_MESSAGE) {
+        // Only toast when *this* player joins a room. Chat messages appear in
+        // the overlay / dialog; member join/leave/kick events appear in the
+        // dialog list only, to avoid spamming toasts during play.
+        if (type == NetPlayStatus.ROOM_JOINED) {
             Handler(Looper.getMainLooper()).post {
                 if (!isChatOpen && message.isNotEmpty()) {
                     Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
