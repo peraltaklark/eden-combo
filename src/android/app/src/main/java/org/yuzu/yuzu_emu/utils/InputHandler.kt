@@ -10,6 +10,8 @@ import android.view.InputDevice
 import android.view.KeyEvent
 import android.view.MotionEvent
 import org.yuzu.yuzu_emu.features.input.NativeInput
+import org.yuzu.yuzu_emu.features.input.model.NativeButton
+import org.yuzu.yuzu_emu.YuzuApplication
 import org.yuzu.yuzu_emu.features.input.YuzuInputOverlayDevice
 import org.yuzu.yuzu_emu.features.input.YuzuPhysicalDevice
 
@@ -90,13 +92,50 @@ object InputHandler {
             controllerData = androidControllers[event.device.controllerNumber] ?: return false
         }
 
+        val keycode = getButtonIdFromEvent(event)
+        val guid = controllerData.getGUID()
+
+        // Combo button interception: if this physical button is bound to a
+        // ComboN for some player, fire the combo and skip native forwarding.
+        if (maybeFireCombo(keycode, guid, action)) return true
+
         NativeInput.onGamePadButtonEvent(
-            controllerData.getGUID(),
+            guid,
             controllerData.getPort(),
-            getButtonIdFromEvent(event),
+            keycode,
             action
         )
         return true
+    }
+
+    /**
+     * Checks each player's Combo1..Combo5 binding to see if (keycode, guid)
+     * matches. If yes, fires the corresponding combo and returns true.
+     */
+    private fun maybeFireCombo(keycode: Int, guid: String, action: Int): Boolean {
+        if (keycode == 0) return false
+        val comboButtons = arrayOf(
+            NativeButton.Combo1, NativeButton.Combo2, NativeButton.Combo3,
+            NativeButton.Combo4, NativeButton.Combo5
+        )
+        for (playerIndex in 0 until 8) {
+            for ((comboIdx, comboBtn) in comboButtons.withIndex()) {
+                val param = NativeInput.getButtonParam(playerIndex, comboBtn)
+                if (param.get("engine", "") == "android" &&
+                    param.get("button", -1) == keycode &&
+                    param.get("guid", "") == guid
+                ) {
+                    ComboHelper.comboActivate(
+                        YuzuApplication.appContext,
+                        playerIndex,
+                        action,
+                        comboIdx
+                    )
+                    return true
+                }
+            }
+        }
+        return false
     }
 
     fun getButtonIdFromEvent(event: KeyEvent): Int {

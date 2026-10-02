@@ -30,7 +30,14 @@ enum class NativeButton(val int: Int) {
     Capture(19),
 
     SLRight(20),
-    SRRight(21);
+    SRRight(21),
+
+    // Android-only combo buttons. Must match src/common/settings_input.h.
+    Combo1(22),
+    Combo2(23),
+    Combo3(24),
+    Combo4(25),
+    Combo5(26);
 
     companion object {
         fun from(int: Int): NativeButton = entries.firstOrNull { it.int == int } ?: A

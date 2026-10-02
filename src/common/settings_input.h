@@ -38,6 +38,15 @@ enum Values : int {
     SLRight,
     SRRight,
 
+    // Android-only combo buttons (never seen by native input; Kotlin intercepts
+    // the physical press before it reaches here, but these enum entries are
+    // required so ButtonInputSetting can read/write the bindings via config).
+    Combo1,
+    Combo2,
+    Combo3,
+    Combo4,
+    Combo5,
+
     NumButtons,
 };
 

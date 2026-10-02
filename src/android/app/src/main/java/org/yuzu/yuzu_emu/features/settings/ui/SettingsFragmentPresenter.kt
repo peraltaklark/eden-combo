@@ -1254,6 +1254,15 @@ class SettingsFragmentPresenter(
                 SliderSetting(vibrationStrengthSetting, R.string.vibration_strength, units = "%")
             )
         }
+            // Combo buttons (bindable to any physical button; pressing one fires
+            // the configured multi-button combo on the virtual controller)
+            add(HeaderSetting(R.string.combo_buttons_header))
+            add(ButtonInputSetting(playerIndex, NativeButton.Combo1, R.string.combo_button_1))
+            add(ButtonInputSetting(playerIndex, NativeButton.Combo2, R.string.combo_button_2))
+            add(ButtonInputSetting(playerIndex, NativeButton.Combo3, R.string.combo_button_3))
+            add(ButtonInputSetting(playerIndex, NativeButton.Combo4, R.string.combo_button_4))
+            add(ButtonInputSetting(playerIndex, NativeButton.Combo5, R.string.combo_button_5))
+
     }
 
     // Convenience function for creating AbstractIntSettings for modifier range/stick range/stick deadzones

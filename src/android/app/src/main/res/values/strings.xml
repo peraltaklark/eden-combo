@@ -1897,4 +1897,5 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     <string name="combo_button_5">Combo Button 5</string>
     <string name="combo_action">Action</string>
     <string name="combo_button_n">Combo Button %1$d</string>
+    <string name="combo_buttons_header">Combo Buttons</string>
 </resources>

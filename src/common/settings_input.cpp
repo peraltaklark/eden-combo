@@ -11,6 +11,7 @@ const std::array<const char*, NumButtons> mapping = {{
     "button_plus",    "button_minus",   "button_dleft",  "button_dup",  "button_dright",
     "button_ddown",   "button_slleft",  "button_srleft", "button_home", "button_screenshot",
     "button_slright", "button_srright",
+    "combo_1", "combo_2", "combo_3", "combo_4", "combo_5",
 }};
 }
 
