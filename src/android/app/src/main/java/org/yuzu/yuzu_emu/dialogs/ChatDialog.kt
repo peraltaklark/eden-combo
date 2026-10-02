@@ -100,14 +100,10 @@ class ChatDialog(context: Context) : BottomSheetDialog(context) {
         val username = StringSetting.WEB_USERNAME.getString()
         NetPlayManager.netPlaySendMessage(message)
 
-        val chatMessage = ChatMessage(
-            nickname = username,
-            username = "",
-            message = message,
-            timestamp = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
+        NetPlayManager.addNetPlayMessage(
+            NetPlayManager.NetPlayStatus.CHAT_MESSAGE,
+            "$username: $message"
         )
-
-        NetPlayManager.addChatMessage(chatMessage)
         chatAdapter.notifyDataSetChanged()
         scrollToBottom()
     }

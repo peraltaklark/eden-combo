@@ -167,21 +167,29 @@ namespace AndroidSettings {
 
         // Chat overlay settings
         Settings::Setting<s32> chat_text_size{linkage, 14, "chat_text_size",
-                                              Settings::Category::Overlay};
+                                              Settings::Category::Overlay,
+                                              Settings::Specialization::Default, true, true};
         Settings::Setting<s32> chat_shadow_radius{linkage, 2, "chat_shadow_radius",
-                                                  Settings::Category::Overlay};
+                                                  Settings::Category::Overlay,
+                                              Settings::Specialization::Default, true, true};
         Settings::Setting<s32> chat_shadow_dx{linkage, 1, "chat_shadow_dx",
-                                              Settings::Category::Overlay};
+                                              Settings::Category::Overlay,
+                                              Settings::Specialization::Default, true, true};
         Settings::Setting<s32> chat_shadow_dy{linkage, 1, "chat_shadow_dy",
-                                              Settings::Category::Overlay};
+                                              Settings::Category::Overlay,
+                                              Settings::Specialization::Default, true, true};
         Settings::Setting<s32> chat_background_opacity{linkage, 40, "chat_background_opacity",
-                                                       Settings::Category::Overlay};
+                                                       Settings::Category::Overlay,
+                                              Settings::Specialization::Default, true, true};
         Settings::Setting<s32> chat_fab_opacity{linkage, 100, "chat_fab_opacity",
-                                                Settings::Category::Overlay};
+                                                Settings::Category::Overlay,
+                                              Settings::Specialization::Default, true, true};
         Settings::Setting<s32> chat_fab_size{linkage, 56, "chat_fab_size",
-                                             Settings::Category::Overlay};
+                                             Settings::Category::Overlay,
+                                              Settings::Specialization::Default, true, true};
         Settings::Setting<s32> chat_max_lines{linkage, 8, "chat_max_lines",
-                                              Settings::Category::Overlay};
+                                              Settings::Category::Overlay,
+                                              Settings::Specialization::Default, true, true};
 
         /// DEVICE/SOC OVERLAY
 
