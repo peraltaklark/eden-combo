@@ -73,7 +73,17 @@ enum class IntSetting(override val key: String) : AbstractIntSetting {
     INPUT_OVERLAY_AUTO_HIDE("input_overlay_auto_hide"),
     OVERLAY_GRID_SIZE("overlay_grid_size"),
     GPU_LOG_RING_BUFFER_SIZE("gpu_log_ring_buffer_size"),
-    ANDROID_PIPELINE_WORKERS("pipeline_worker_count")
+    ANDROID_PIPELINE_WORKERS("pipeline_worker_count"),
+
+    // Chat overlay settings
+    CHAT_TEXT_SIZE("chat_text_size"),
+    CHAT_SHADOW_RADIUS("chat_shadow_radius"),
+    CHAT_SHADOW_DX("chat_shadow_dx"),
+    CHAT_SHADOW_DY("chat_shadow_dy"),
+    CHAT_BACKGROUND_OPACITY("chat_background_opacity"),
+    CHAT_FAB_OPACITY("chat_fab_opacity"),
+    CHAT_FAB_SIZE("chat_fab_size"),
+    CHAT_MAX_LINES("chat_max_lines")
     ;
 
     override fun getInt(needsGlobal: Boolean): Int = NativeConfig.getInt(key, needsGlobal)

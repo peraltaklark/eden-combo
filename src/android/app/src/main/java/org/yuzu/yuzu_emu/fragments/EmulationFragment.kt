@@ -83,6 +83,7 @@ import org.yuzu.yuzu_emu.features.settings.utils.SettingsFile
 import org.yuzu.yuzu_emu.model.DriverViewModel
 import org.yuzu.yuzu_emu.model.EmulationViewModel
 import org.yuzu.yuzu_emu.model.Game
+import org.yuzu.yuzu_emu.overlay.ChatOverlayManager
 import org.yuzu.yuzu_emu.overlay.model.OverlayControl
 import org.yuzu.yuzu_emu.overlay.model.OverlayLayout
 import org.yuzu.yuzu_emu.utils.DirectoryInitialization
@@ -110,6 +111,7 @@ import kotlin.or
 
 class EmulationFragment : Fragment(), SurfaceHolder.Callback {
     private lateinit var emulationState: EmulationState
+    private lateinit var chatOverlayManager: ChatOverlayManager
     private var emulationActivity: EmulationActivity? = null
 
     private var perfStatsUpdater: (() -> Unit)? = null
@@ -616,6 +618,23 @@ class EmulationFragment : Fragment(), SurfaceHolder.Callback {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // Chat overlay manager (wires up chat container, FAB and netplay listener)
+        val chatContainer = view.findViewById<android.view.View>(R.id.chatContainer)
+        val chatRecycler =
+            view.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.chatRecycler)
+        val chatButton =
+            view.findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(
+                R.id.chatButton
+            )
+        if (chatContainer != null && chatRecycler != null && chatButton != null) {
+            chatOverlayManager = ChatOverlayManager(
+                chatContainer,
+                chatRecycler,
+                chatButton,
+                requireContext()
+            )
+        }
         if (requireActivity().isFinishing) {
             return
         }
@@ -1473,6 +1492,9 @@ class EmulationFragment : Fragment(), SurfaceHolder.Callback {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        if (::chatOverlayManager.isInitialized) {
+            chatOverlayManager.cleanup()
+        }
         amiiboLoadJob?.cancel()
         amiiboLoadJob = null
         perfStatsRunnable?.let { perfStatsUpdateHandler.removeCallbacks(it) }
@@ -1493,6 +1515,10 @@ class EmulationFragment : Fragment(), SurfaceHolder.Callback {
 
     override fun onResume() {
         super.onResume()
+
+        if (::chatOverlayManager.isInitialized) {
+            chatOverlayManager.onFragmentResume()
+        }
         NativeLibrary.refreshThreadPolicies()
         val b = _binding ?: return
         updateStatsPosition(IntSetting.PERF_OVERLAY_POSITION.getInt())

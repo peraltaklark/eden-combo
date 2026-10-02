@@ -70,11 +70,21 @@ object NetPlayManager {
         val gameName: String
     )
 
-    private var messageListener: ((Int, String) -> Unit)? = null
+    private val messageListeners = mutableListOf<(Int, String) -> Unit>()
     private var adapterRefreshListener: ((Int, String) -> Unit)? = null
 
+    fun addOnMessageReceivedListener(listener: (Int, String) -> Unit) {
+        if (!messageListeners.contains(listener)) messageListeners.add(listener)
+    }
+
+    fun removeOnMessageReceivedListener(listener: (Int, String) -> Unit) {
+        messageListeners.remove(listener)
+    }
+
+    // Kept for backwards compatibility with single-listener callers
     fun setOnMessageReceivedListener(listener: (Int, String) -> Unit) {
-        messageListener = listener
+        messageListeners.clear()
+        messageListeners.add(listener)
     }
 
     fun getPublicRooms(): List<RoomInfo> {
@@ -205,7 +215,7 @@ object NetPlayManager {
             }
         }
 
-        messageListener?.invoke(type, msg)
+        messageListeners.forEach { it.invoke(type, msg) }
         adapterRefreshListener?.invoke(type, msg)
     }
 

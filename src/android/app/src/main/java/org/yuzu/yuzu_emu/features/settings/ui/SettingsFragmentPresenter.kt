@@ -175,6 +175,7 @@ class SettingsFragmentPresenter(
             MenuTag.SECTION_POST_PROCESSING -> addPostProcessingSettings(sl)
             MenuTag.SECTION_PERFORMANCE_STATS -> addPerformanceOverlaySettings(sl)
             MenuTag.SECTION_SOC_OVERLAY -> addSocOverlaySettings(sl)
+            MenuTag.SECTION_CHAT_OVERLAY -> addChatOverlaySettings(sl)
             MenuTag.SECTION_INPUT_OVERLAY -> addInputOverlaySettings(sl)
             MenuTag.SECTION_AUDIO -> addAudioSettings(sl)
             MenuTag.SECTION_INPUT -> addInputSettings(sl)
@@ -441,6 +442,14 @@ class SettingsFragmentPresenter(
                 )
                 add(
                     SubmenuSetting(
+                        titleId = R.string.chat_overlay_settings,
+                        descriptionId = R.string.chat_overlay_settings_description,
+                        iconId = R.drawable.ic_chat,
+                        menuKey = MenuTag.SECTION_CHAT_OVERLAY
+                    )
+                )
+                add(
+                    SubmenuSetting(
                         titleId = R.string.input_overlay_options,
                         iconId = R.drawable.ic_controller,
                         descriptionId = R.string.input_overlay_options_description,
@@ -629,6 +638,87 @@ class SettingsFragmentPresenter(
             add(BooleanSetting.ENABLE_INPUT_OVERLAY_AUTO_HIDE.key)
             add(IntSetting.INPUT_OVERLAY_AUTO_HIDE.key)
             add(BooleanSetting.HIDE_OVERLAY_ON_CONTROLLER_INPUT.key)
+        }
+    }
+
+    private fun addChatOverlaySettings(sl: ArrayList<SettingsItem>) {
+        sl.apply {
+            add(
+                SliderSetting(
+                    IntSetting.CHAT_TEXT_SIZE,
+                    R.string.chat_text_size,
+                    descriptionId = R.string.chat_text_size_description,
+                    min = 10,
+                    max = 24,
+                    units = "sp"
+                )
+            )
+            add(
+                SliderSetting(
+                    IntSetting.CHAT_SHADOW_RADIUS,
+                    R.string.chat_shadow_radius,
+                    descriptionId = R.string.chat_shadow_radius_description,
+                    min = 0,
+                    max = 10
+                )
+            )
+            add(
+                SliderSetting(
+                    IntSetting.CHAT_SHADOW_DX,
+                    R.string.chat_shadow_dx,
+                    descriptionId = R.string.chat_shadow_dx_description,
+                    min = 0,
+                    max = 10
+                )
+            )
+            add(
+                SliderSetting(
+                    IntSetting.CHAT_SHADOW_DY,
+                    R.string.chat_shadow_dy,
+                    descriptionId = R.string.chat_shadow_dy_description,
+                    min = 0,
+                    max = 10
+                )
+            )
+            add(
+                SliderSetting(
+                    IntSetting.CHAT_BACKGROUND_OPACITY,
+                    R.string.chat_background_opacity,
+                    descriptionId = R.string.chat_background_opacity_description,
+                    min = 0,
+                    max = 100,
+                    units = "%"
+                )
+            )
+            add(
+                SliderSetting(
+                    IntSetting.CHAT_FAB_OPACITY,
+                    R.string.chat_fab_opacity,
+                    descriptionId = R.string.chat_fab_opacity_description,
+                    min = 0,
+                    max = 100,
+                    units = "%"
+                )
+            )
+            add(
+                SliderSetting(
+                    IntSetting.CHAT_FAB_SIZE,
+                    R.string.chat_fab_size,
+                    descriptionId = R.string.chat_fab_size_description,
+                    min = 40,
+                    max = 80,
+                    units = "dp"
+                )
+            )
+            add(
+                SliderSetting(
+                    IntSetting.CHAT_MAX_LINES,
+                    R.string.chat_max_lines,
+                    descriptionId = R.string.chat_max_lines_description,
+                    min = 1,
+                    max = 20
+                )
+            )
         }
     }
 

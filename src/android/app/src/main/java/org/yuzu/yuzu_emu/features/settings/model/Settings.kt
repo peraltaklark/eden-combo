@@ -16,6 +16,7 @@ object Settings {
         SECTION_PERFORMANCE_STATS(R.string.stats_overlay_options),
         SECTION_INPUT_OVERLAY(R.string.input_overlay_options),
         SECTION_SOC_OVERLAY(R.string.soc_overlay_options),
+        SECTION_CHAT_OVERLAY(R.string.chat_overlay_settings),
         SECTION_AUDIO(R.string.preferences_audio),
         SECTION_INPUT(R.string.preferences_controls),
         SECTION_INPUT_PLAYER_ONE,
