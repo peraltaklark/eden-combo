@@ -208,10 +208,13 @@ object NetPlayManager {
             }
         }
 
-        Handler(Looper.getMainLooper()).post {
-            if (!isChatOpen) {
-                // TODO(alekpop, crueter): Improve this, potentially a drawer at the top?
-                Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        // Toast only system messages (not chat), and only when the chat dialog
+        // is closed. Chat messages are shown in the overlay / dialog instead.
+        if (type != NetPlayStatus.CHAT_MESSAGE) {
+            Handler(Looper.getMainLooper()).post {
+                if (!isChatOpen && message.isNotEmpty()) {
+                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                }
             }
         }
 
