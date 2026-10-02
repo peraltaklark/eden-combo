@@ -208,10 +208,32 @@ object NetPlayManager {
             }
         }
 
-        // Only toast when *this* player joins a room. Chat messages appear in
-        // the overlay / dialog; member join/leave/kick events appear in the
-        // dialog list only, to avoid spamming toasts during play.
-        if (type == NetPlayStatus.ROOM_JOINED) {
+        // Toast only for events the user needs to see immediately:
+        //  - they successfully joined a room
+        //  - an error occurred (wrong password, room full, connection failed, ...)
+        // Chat messages appear in the overlay / dialog. Member join/leave/kick
+        // events appear in the dialog list only, to avoid spamming toasts.
+        val toastTypes = setOf(
+            NetPlayStatus.ROOM_JOINED,
+            NetPlayStatus.NETWORK_ERROR,
+            NetPlayStatus.LOST_CONNECTION,
+            NetPlayStatus.NAME_COLLISION,
+            NetPlayStatus.MAC_COLLISION,
+            NetPlayStatus.CONSOLE_ID_COLLISION,
+            NetPlayStatus.WRONG_VERSION,
+            NetPlayStatus.WRONG_PASSWORD,
+            NetPlayStatus.COULD_NOT_CONNECT,
+            NetPlayStatus.ROOM_IS_FULL,
+            NetPlayStatus.HOST_BANNED,
+            NetPlayStatus.PERMISSION_DENIED,
+            NetPlayStatus.NO_SUCH_USER,
+            NetPlayStatus.ALREADY_IN_ROOM,
+            NetPlayStatus.CREATE_ROOM_ERROR,
+            NetPlayStatus.HOST_KICKED,
+            NetPlayStatus.UNKNOWN_ERROR,
+            NetPlayStatus.ROOM_UNINITIALIZED
+        )
+        if (type in toastTypes) {
             Handler(Looper.getMainLooper()).post {
                 if (!isChatOpen && message.isNotEmpty()) {
                     Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
