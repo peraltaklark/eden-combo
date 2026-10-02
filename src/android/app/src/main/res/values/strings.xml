@@ -1899,7 +1899,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     <string name="combo_button_n">Combo Button %1$d</string>
     <string name="combo_buttons_header">Combo Buttons</string>
 
-    <string name="chat">Chat</string>
     <string name="chat_overlay_settings">Chat Overlay</string>
     <string name="chat_overlay_settings_description">Customize the appearance of the in-game chat overlay.</string>
     <string name="chat_text_size">Chat Text Size</string>
