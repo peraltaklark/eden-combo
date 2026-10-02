@@ -36,6 +36,14 @@ class ChatDialog(context: Context) : BottomSheetDialog(context) {
     private lateinit var binding: DialogChatBinding
     private lateinit var chatAdapter: ChatAdapter
     private val handler = Handler(Looper.getMainLooper())
+
+    @SuppressLint("NotifyDataSetChanged")
+    private val messageListener: (Int, String) -> Unit = { _, _ ->
+        handler.post {
+            chatAdapter.notifyDataSetChanged()
+            scrollToBottom()
+        }
+    }
     private val hideSystemBars: Boolean by lazy {
         runCatching {
             FullscreenHelper.shouldHideSystemBars(CompatUtils.findActivity(context))
@@ -69,12 +77,7 @@ class ChatDialog(context: Context) : BottomSheetDialog(context) {
             }
         }
 
-        NetPlayManager.setOnMessageReceivedListener { type, message ->
-            handler.post {
-                chatAdapter.notifyDataSetChanged()
-                scrollToBottom()
-            }
-        }
+        NetPlayManager.addOnMessageReceivedListener(messageListener)
 
         binding.sendButton.setOnClickListener {
             val message = binding.chatInput.text.toString()
@@ -92,6 +95,7 @@ class ChatDialog(context: Context) : BottomSheetDialog(context) {
 
     override fun dismiss() {
         NetPlayManager.setChatOpen(false)
+        NetPlayManager.removeOnMessageReceivedListener(messageListener)
         super.dismiss()
     }
 
