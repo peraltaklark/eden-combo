@@ -72,7 +72,7 @@ class NetPlayDialog(context: Context) : BottomSheetDialog(context) {
                     listMultiplayer.adapter = adapter
                     adapter.loadMultiplayerMenu()
                     btnLeave.setOnClickListener {
-                        NetPlayManager.netPlayLeaveRoom()
+                        NetPlayManager.leaveRoom()
                         dismiss()
                     }
                     btnChat.setOnClickListener {

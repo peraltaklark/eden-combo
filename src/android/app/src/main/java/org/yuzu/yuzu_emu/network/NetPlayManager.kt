@@ -44,6 +44,18 @@ object NetPlayManager {
     external fun netPlaySendMessage(msg: String)
     external fun netPlayKickUser(username: String)
     external fun netPlayLeaveRoom()
+
+    /**
+     * Leaves the current room cleanly: stops the native connection, clears
+     * the local chat history, and notifies every listener (overlay, dialog,
+     * lobby) that the room is now idle.
+     */
+    fun leaveRoom() {
+        netPlayLeaveRoom()
+        clearChat()
+        messageListeners.forEach { it.invoke(NetPlayStatus.ROOM_IDLE, "") }
+        adapterRefreshListener?.invoke(NetPlayStatus.ROOM_IDLE, "")
+    }
     external fun netPlayIsModerator(): Boolean
     external fun netPlayGetBanList(): Array<String>
     external fun netPlayBanUser(username: String)
