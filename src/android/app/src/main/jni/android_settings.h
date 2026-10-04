@@ -25,6 +25,7 @@ namespace AndroidSettings {
         std::pair<double, double> portrait_position;
         std::pair<double, double> foldable_position;
         float individual_scale;
+        bool toggle_hold{false}; // [overlay-profile]
     };
 
     struct Values {
@@ -71,6 +72,13 @@ namespace AndroidSettings {
 
         // Input/performance overlay settings
         std::vector<OverlayControlData> overlay_control_data;
+        // [overlay-profile] A game's own layout for the touch controls. While it is active (the game
+        // runs on its custom config and has one saved) it is used instead of the global layout.
+        std::vector<OverlayControlData> custom_overlay_control_data;
+        bool use_custom_overlay{false};
+        std::vector<OverlayControlData>& ActiveOverlayControlData() {
+            return use_custom_overlay ? custom_overlay_control_data : overlay_control_data;
+        }
         Settings::Setting<s32> overlay_scale{linkage, 50, "control_scale",
                                              Settings::Category::Overlay};
         Settings::Setting<s32> overlay_opacity{linkage, 100, "control_opacity",

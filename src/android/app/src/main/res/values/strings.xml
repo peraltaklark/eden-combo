@@ -27,6 +27,14 @@
     <string name="show_input_overlay">Show Input Overlay</string>
     <string name="show_input_overlay_description">Display touch controls overlay during emulation</string>
     <string name="overlay_snap_to_grid">Snap to Grid</string>
+    <!-- [overlay-profile] -->
+    <string name="overlay_save_scope_title">Save the on-screen controls</string>
+    <string name="overlay_save_scope_message">You changed the on-screen controls. Keep the change only for %1$s, or for every game?</string>
+    <string name="overlay_save_this_game">Only this game</string>
+    <string name="overlay_save_all_games">All games</string>
+    <string name="overlay_discard_changes">Discard changes</string>
+    <string name="overlay_saved_for_game">On-screen controls saved for %1$s</string>
+    <string name="overlay_toggle_hold">Tap to hold (tap again to release)</string>
     <string name="overlay_snap_to_grid_description">Snap overlay controls to a grid when editing</string>
     <string name="overlay_grid_size">Grid Size</string>
     <string name="overlay_grid_size_description">Size of the grid cells in pixels</string>

@@ -85,6 +85,8 @@ import org.yuzu.yuzu_emu.model.EmulationViewModel
 import org.yuzu.yuzu_emu.model.Game
 import org.yuzu.yuzu_emu.overlay.ChatOverlayManager
 import org.yuzu.yuzu_emu.overlay.model.OverlayControl
+import org.yuzu.yuzu_emu.overlay.model.OverlayControlData
+import org.yuzu.yuzu_emu.utils.PerGameOverlay
 import org.yuzu.yuzu_emu.overlay.model.OverlayLayout
 import org.yuzu.yuzu_emu.utils.DirectoryInitialization
 import org.yuzu.yuzu_emu.utils.FileUtil
@@ -1539,12 +1541,61 @@ class EmulationFragment : Fragment(), SurfaceHolder.Callback {
         addQuickSettings()
     }
 
+    // [overlay-profile] per-game layout of the on-screen controls
+    private var overlayEditBefore: Array<OverlayControlData>? = null
+    private var overlayEditWasCustom = false
+
+    /** Remembers the touch controls layout before an edit, to ask where to keep it afterwards. */
+    private fun beginOverlayEdit() {
+        overlayEditBefore = PerGameOverlay.snapshot()
+        overlayEditWasCustom = NativeConfig.isCustomOverlayActive()
+    }
+
+    /**
+     * If the edit changed the layout, asks whether it is for every game or only for this one.
+     * Closing the dialog keeps the change for every game, as it always worked.
+     */
+    private fun finishOverlayEdit() {
+        val before = overlayEditBefore ?: return
+        overlayEditBefore = null
+        val target = game ?: return
+        if (_binding == null || !PerGameOverlay.changed(before)) {
+            return
+        }
+        val wasCustom = overlayEditWasCustom
+        val edited = NativeConfig.getOverlayControlData()
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.overlay_save_scope_title)
+            .setMessage(getString(R.string.overlay_save_scope_message, target.title))
+            .setPositiveButton(R.string.overlay_save_this_game) { _, _ ->
+                PerGameOverlay.saveForThisGame(target, before, wasCustom, edited)
+                shouldUseCustom = true
+                _binding?.surfaceInputOverlay?.refreshControls()
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.overlay_saved_for_game, target.title),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+            .setNegativeButton(R.string.overlay_save_all_games) { _, _ ->
+                PerGameOverlay.saveForAllGames(target, edited, wasCustom)
+                _binding?.surfaceInputOverlay?.refreshControls()
+            }
+            .setNeutralButton(R.string.overlay_discard_changes) { _, _ ->
+                PerGameOverlay.discard(before, wasCustom)
+                _binding?.surfaceInputOverlay?.refreshControls()
+            }
+            .show()
+    }
+
     private fun resetInputOverlay() {
         IntSetting.OVERLAY_SCALE.reset()
         IntSetting.OVERLAY_OPACITY.reset()
+        beginOverlayEdit()
         binding.surfaceInputOverlay.post {
             binding.surfaceInputOverlay.resetLayoutVisibilityAndPlacement()
             binding.surfaceInputOverlay.resetIndividualControlScale()
+            finishOverlayEdit()
         }
     }
 
@@ -2138,9 +2189,11 @@ class EmulationFragment : Fragment(), SurfaceHolder.Callback {
                             }
                         }
                         .setPositiveButton(android.R.string.ok) { _, _ ->
+                            beginOverlayEdit() // [overlay-profile]
                             NativeConfig.setOverlayControlData(overlayControlData)
                             NativeConfig.saveGlobalConfig()
                             binding.surfaceInputOverlay.refreshControls()
+                            finishOverlayEdit()
                         }
                         .setNegativeButton(android.R.string.cancel, null)
                         .setNeutralButton(R.string.emulation_toggle_all) { _, _ -> }
@@ -2221,6 +2274,7 @@ class EmulationFragment : Fragment(), SurfaceHolder.Callback {
                     }
             }
         }
+        beginOverlayEdit() // [overlay-profile]
         binding.doneControlConfig.setVisible(true)
         binding.surfaceInputOverlay.setIsInEditMode(true)
     }
@@ -2235,6 +2289,7 @@ class EmulationFragment : Fragment(), SurfaceHolder.Callback {
             }
         }
         NativeConfig.saveGlobalConfig()
+        finishOverlayEdit() // [overlay-profile]
     }
 
     @SuppressLint("SetTextI18n")

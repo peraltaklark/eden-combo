@@ -69,6 +69,7 @@ jfieldID GetOverlayControlDataIndividualScaleField();
 jfieldID GetOverlayControlDataLandscapePositionField();
 jfieldID GetOverlayControlDataPortraitPositionField();
 jfieldID GetOverlayControlDataFoldablePositionField();
+jfieldID GetOverlayControlDataToggleHoldField(); // [overlay-profile]
 
 jclass GetPatchClass();
 jmethodID GetPatchConstructor();

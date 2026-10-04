@@ -51,6 +51,7 @@ static jfieldID s_overlay_control_data_individual_scale_field;
 static jfieldID s_overlay_control_data_landscape_position_field;
 static jfieldID s_overlay_control_data_portrait_position_field;
 static jfieldID s_overlay_control_data_foldable_position_field;
+static jfieldID s_overlay_control_data_toggle_hold_field; // [overlay-profile]
 
 static jclass s_patch_class;
 static jmethodID s_patch_constructor;
@@ -256,6 +257,10 @@ namespace Common::Android {
 
     jfieldID GetOverlayControlDataFoldablePositionField() {
         return s_overlay_control_data_foldable_position_field;
+    }
+
+    jfieldID GetOverlayControlDataToggleHoldField() {
+        return s_overlay_control_data_toggle_hold_field;
     }
 
     jclass GetPatchClass() {
@@ -533,7 +538,7 @@ void Initialize(JavaVM* vm, JNIEnv *env) {
         reinterpret_cast<jclass>(env->NewGlobalRef(overlay_control_data_class));
     s_overlay_control_data_constructor =
         env->GetMethodID(overlay_control_data_class, "<init>",
-                         "(Ljava/lang/String;ZLkotlin/Pair;Lkotlin/Pair;Lkotlin/Pair;F)V");
+                         "(Ljava/lang/String;ZLkotlin/Pair;Lkotlin/Pair;Lkotlin/Pair;FZ)V");
     s_overlay_control_data_id_field =
         env->GetFieldID(overlay_control_data_class, "id", "Ljava/lang/String;");
     s_overlay_control_data_enabled_field =
@@ -546,6 +551,8 @@ void Initialize(JavaVM* vm, JNIEnv *env) {
         env->GetFieldID(overlay_control_data_class, "foldablePosition", "Lkotlin/Pair;");
     s_overlay_control_data_individual_scale_field =
         env->GetFieldID(overlay_control_data_class, "individualScale", "F");
+    s_overlay_control_data_toggle_hold_field =
+        env->GetFieldID(overlay_control_data_class, "toggleHold", "Z");
     env->DeleteLocalRef(overlay_control_data_class);
 
     const jclass patch_class = env->FindClass("org/yuzu/yuzu_emu/model/Patch");

@@ -7,9 +7,11 @@ import android.app.Dialog
 import android.content.Context
 import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.View
 import android.view.WindowManager
 import android.widget.TextView
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.slider.Slider
 import org.yuzu.yuzu_emu.R
 import org.yuzu.yuzu_emu.overlay.model.OverlayControlData
@@ -17,11 +19,14 @@ import org.yuzu.yuzu_emu.overlay.model.OverlayControlData
 class OverlayScaleDialog(
     context: Context,
     private val overlayControlData: OverlayControlData,
+    private val showToggleHold: Boolean = false, // [overlay-profile]
+    private val onToggleHoldChanged: ((Boolean) -> Unit)? = null,
     private val onScaleChanged: (Float) -> Unit
 ) : Dialog(context) {
 
     private var currentScale = overlayControlData.individualScale
     private val originalScale = overlayControlData.individualScale
+    private var currentToggleHold = overlayControlData.toggleHold
     private lateinit var scaleValueText: TextView
     private lateinit var scaleSlider: Slider
 
@@ -47,6 +52,12 @@ class OverlayScaleDialog(
         val resetButton = view.findViewById<MaterialButton>(R.id.resetButton)
         val confirmButton = view.findViewById<MaterialButton>(R.id.confirmButton)
         val cancelButton = view.findViewById<MaterialButton>(R.id.cancelButton)
+        val toggleHoldCheck = view.findViewById<MaterialCheckBox>(R.id.toggleHoldCheck)
+        toggleHoldCheck.visibility = if (showToggleHold) View.VISIBLE else View.GONE
+        toggleHoldCheck.isChecked = currentToggleHold
+        toggleHoldCheck.setOnCheckedChangeListener { _, checked ->
+            currentToggleHold = checked
+        }
 
         scaleValueText.text = String.format("%.1fx",  currentScale)
         scaleSlider.value = currentScale
@@ -79,6 +90,10 @@ class OverlayScaleDialog(
             overlayControlData.individualScale = currentScale
             //slider value is already saved on touch dispatch but just to be sure
             onScaleChanged(currentScale)
+            if (showToggleHold && currentToggleHold != overlayControlData.toggleHold) {
+                overlayControlData.toggleHold = currentToggleHold
+                onToggleHoldChanged?.invoke(currentToggleHold)
+            }
             dismiss()
         }
 

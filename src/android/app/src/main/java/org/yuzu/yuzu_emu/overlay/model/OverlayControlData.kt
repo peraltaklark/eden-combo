@@ -9,7 +9,8 @@ data class OverlayControlData(
     var landscapePosition: Pair<Double, Double>,
     var portraitPosition: Pair<Double, Double>,
     var foldablePosition: Pair<Double, Double>,
-    var individualScale: Float
+    var individualScale: Float,
+    var toggleHold: Boolean = false // [overlay-profile]
 ) {
     fun positionFromLayout(layout: OverlayLayout): Pair<Double, Double> =
         when (layout) {

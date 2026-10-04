@@ -36,6 +36,17 @@
             app:trackColorActive="@color/eden_border_gradient_start"
             app:trackColorInactive="@color/eden_border_gradient_end"
             app:tickColor="@color/eden_border_gradient_start"/>
+
+        <!-- [overlay-profile] -->
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/toggleHoldCheck"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:text="@string/overlay_toggle_hold"
+            android:textColor="#FFFFFF"
+            android:visibility="gone" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

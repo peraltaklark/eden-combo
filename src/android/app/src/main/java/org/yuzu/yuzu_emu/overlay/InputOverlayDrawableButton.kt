@@ -78,12 +78,21 @@ class InputOverlayDrawableButton(
         val isActionUp =
             motionEvent == MotionEvent.ACTION_UP || motionEvent == MotionEvent.ACTION_POINTER_UP
 
+        // [overlay-profile] tap-to-hold: a tap presses, the next tap releases
+        val latching = overlayControlData.toggleHold && comboIndex < 0
+
         if (isActionDown) {
             if (!bounds.contains(xPosition, yPosition)) {
                 return false
             }
-            pressedState = true
             trackId = pointerId
+            if (latching) {
+                latched = !latched
+                pressedState = latched
+            } else {
+                latched = false
+                pressedState = true
+            }
             return true
         }
 
@@ -91,12 +100,28 @@ class InputOverlayDrawableButton(
             if (trackId != pointerId) {
                 return false
             }
-            pressedState = false
             trackId = -1
+            if (latching) {
+                // The press stays active until the next tap.
+                return false
+            }
+            pressedState = false
             return true
         }
 
         return false
+    }
+
+    private var latched = false
+
+    /** Releases a button that tap-to-hold keeps pressed. Returns true if it was held. */
+    fun releaseLatched(): Boolean {
+        if (!latched) {
+            return false
+        }
+        latched = false
+        pressedState = false
+        return true
     }
 
     fun setPosition(x: Int, y: Int) {

@@ -180,6 +180,22 @@ object NativeConfig {
     @Synchronized
     external fun setOverlayControlData(overlayControlData: Array<OverlayControlData>)
 
+    // [overlay-profile] the global layout (global = true) or the loaded game's own layout
+    @Synchronized
+    external fun getOverlayControlDataFor(global: Boolean): Array<OverlayControlData>
+
+    @Synchronized
+    external fun setOverlayControlDataFor(
+        overlayControlData: Array<OverlayControlData>,
+        global: Boolean
+    )
+
+    @Synchronized
+    external fun isCustomOverlayActive(): Boolean
+
+    @Synchronized
+    external fun setCustomOverlayActive(active: Boolean)
+
     @Synchronized
     external fun getInputSettings(global: Boolean): Array<PlayerInput>
 

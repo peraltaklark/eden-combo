@@ -844,6 +844,7 @@ class InputOverlay(context: Context, attrs: AttributeSet?) :
             gamelessMode = true
         }
 
+        releaseLatchedButtons() // [overlay-profile]
         // Remove all the overlay buttons from the HashSet.
         overlayButtons.clear()
         overlayDpads.clear()
@@ -882,7 +883,30 @@ class InputOverlay(context: Context, attrs: AttributeSet?) :
         NativeConfig.setOverlayControlData(overlayControlData)
     }
 
+    // [overlay-profile] tap-to-hold support
+    /** Releases every button that tap-to-hold is keeping pressed. */
+    private fun releaseLatchedButtons() {
+        val playerIndex = when (NativeInput.getStyleIndex(0)) {
+            NpadStyleIndex.Handheld -> 8
+            else -> 0
+        }
+        for (button in overlayButtons) {
+            if (button.releaseLatched()) {
+                NativeInput.onOverlayButtonEvent(playerIndex, button.button, button.status)
+            }
+        }
+    }
+
+    private fun saveToggleHold(id: String, enabled: Boolean) {
+        val overlayControlData = NativeConfig.getOverlayControlData()
+        overlayControlData.firstOrNull { it.id == id }?.toggleHold = enabled
+        NativeConfig.setOverlayControlData(overlayControlData)
+    }
+
     fun setIsInEditMode(editMode: Boolean) {
+        if (editMode) {
+            releaseLatchedButtons()
+        }
         inEditMode = editMode
         if (!editMode) {
             scaleDialog?.dismiss()
@@ -912,7 +936,15 @@ class InputOverlay(context: Context, attrs: AttributeSet?) :
                     overlayControlData.firstOrNull { it.id == button.overlayControlData.id }
                 if (buttonData != null) {
                     scaleDialog =
-                        OverlayScaleDialog(context, button.overlayControlData) { newScale ->
+                        OverlayScaleDialog(
+                            context,
+                            button.overlayControlData,
+                            showToggleHold = button.comboIndex < 0,
+                            onToggleHoldChanged = { enabled ->
+                                saveToggleHold(button.overlayControlData.id, enabled)
+                                refreshControls()
+                            }
+                        ) { newScale ->
                             saveControlPosition(
                                 button.overlayControlData.id,
                                 button.bounds.centerX(),

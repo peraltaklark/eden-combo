@@ -61,6 +61,9 @@ void Java_org_yuzu_yuzu_1emu_utils_NativeConfig_unloadGlobalConfig(JNIEnv* env, 
 void Java_org_yuzu_yuzu_1emu_utils_NativeConfig_reloadGlobalConfig(JNIEnv* env, jobject obj) {
     global_config->AndroidConfig::ReloadAllValues();
     ResetFxChainToGlobal();
+    // [overlay-profile] Back on the global layout for the touch controls.
+    AndroidSettings::values.use_custom_overlay = false;
+    AndroidSettings::values.custom_overlay_control_data.clear();
 }
 
 void Java_org_yuzu_yuzu_1emu_utils_NativeConfig_saveGlobalConfig(JNIEnv* env, jobject obj) {
@@ -381,13 +384,13 @@ void Java_org_yuzu_yuzu_1emu_utils_NativeConfig_setDisabledAddons(JNIEnv* env, j
     Settings::values.disabled_addons[program_id] = disabled_addons;
 }
 
-jobjectArray Java_org_yuzu_yuzu_1emu_utils_NativeConfig_getOverlayControlData(JNIEnv* env,
-                                                                              jobject obj) {
+// [overlay-profile]
+static jobjectArray OverlayControlDataToJava(
+    JNIEnv* env, const std::vector<AndroidSettings::OverlayControlData>& data) {
     jobjectArray joverlayControlDataArray =
-        env->NewObjectArray(AndroidSettings::values.overlay_control_data.size(),
-                            Common::Android::GetOverlayControlDataClass(), nullptr);
-    for (size_t i = 0; i < AndroidSettings::values.overlay_control_data.size(); ++i) {
-        const auto& control_data = AndroidSettings::values.overlay_control_data[i];
+        env->NewObjectArray(data.size(), Common::Android::GetOverlayControlDataClass(), nullptr);
+    for (size_t i = 0; i < data.size(); ++i) {
+        const auto& control_data = data[i];
         jobject jlandscapePosition =
             env->NewObject(Common::Android::GetPairClass(), Common::Android::GetPairConstructor(),
                            Common::Android::ToJDouble(env, control_data.landscape_position.first),
@@ -406,16 +409,16 @@ jobjectArray Java_org_yuzu_yuzu_1emu_utils_NativeConfig_getOverlayControlData(JN
                            Common::Android::GetOverlayControlDataConstructor(),
                            Common::Android::ToJString(env, control_data.id), control_data.enabled,
                            jlandscapePosition, jportraitPosition, jfoldablePosition,
-                           control_data.individual_scale);
+                           control_data.individual_scale, control_data.toggle_hold);
 
         env->SetObjectArrayElement(joverlayControlDataArray, i, jcontrolData);
     }
     return joverlayControlDataArray;
 }
 
-void Java_org_yuzu_yuzu_1emu_utils_NativeConfig_setOverlayControlData(
-    JNIEnv* env, jobject obj, jobjectArray joverlayControlDataArray) {
-    AndroidSettings::values.overlay_control_data.clear();
+static void OverlayControlDataFromJava(JNIEnv* env, jobjectArray joverlayControlDataArray,
+                                       std::vector<AndroidSettings::OverlayControlData>& out) {
+    out.clear();
     int size = env->GetArrayLength(joverlayControlDataArray);
 
     if (size == 0) {
@@ -459,10 +462,49 @@ void Java_org_yuzu_yuzu_1emu_utils_NativeConfig_setOverlayControlData(
         float individual_scale = static_cast<float>(env->GetFloatField(
             joverlayControlData, Common::Android::GetOverlayControlDataIndividualScaleField()));
 
-        AndroidSettings::values.overlay_control_data.push_back(AndroidSettings::OverlayControlData{
+        bool toggle_hold = static_cast<bool>(env->GetBooleanField(
+            joverlayControlData, Common::Android::GetOverlayControlDataToggleHoldField()));
+
+        out.push_back(AndroidSettings::OverlayControlData{
             Common::Android::GetJString(env, jidString), enabled, landscape_position,
-            portrait_position, foldable_position, individual_scale});
+            portrait_position, foldable_position, individual_scale, toggle_hold});
     }
+}
+
+// The layout the touch controls are using right now: the game's own if it has one, else the
+// global one.
+jobjectArray Java_org_yuzu_yuzu_1emu_utils_NativeConfig_getOverlayControlData(JNIEnv* env,
+                                                                              jobject obj) {
+    return OverlayControlDataToJava(env, AndroidSettings::values.ActiveOverlayControlData());
+}
+
+void Java_org_yuzu_yuzu_1emu_utils_NativeConfig_setOverlayControlData(
+    JNIEnv* env, jobject obj, jobjectArray joverlayControlDataArray) {
+    OverlayControlDataFromJava(env, joverlayControlDataArray,
+                               AndroidSettings::values.ActiveOverlayControlData());
+}
+
+jobjectArray Java_org_yuzu_yuzu_1emu_utils_NativeConfig_getOverlayControlDataFor(
+    JNIEnv* env, jobject obj, jboolean jglobal) {
+    return OverlayControlDataToJava(env, jglobal ? AndroidSettings::values.overlay_control_data
+                                                 : AndroidSettings::values.custom_overlay_control_data);
+}
+
+void Java_org_yuzu_yuzu_1emu_utils_NativeConfig_setOverlayControlDataFor(
+    JNIEnv* env, jobject obj, jobjectArray joverlayControlDataArray, jboolean jglobal) {
+    OverlayControlDataFromJava(env, joverlayControlDataArray,
+                               jglobal ? AndroidSettings::values.overlay_control_data
+                                       : AndroidSettings::values.custom_overlay_control_data);
+}
+
+jboolean Java_org_yuzu_yuzu_1emu_utils_NativeConfig_isCustomOverlayActive(JNIEnv* env,
+                                                                          jobject obj) {
+    return AndroidSettings::values.use_custom_overlay;
+}
+
+void Java_org_yuzu_yuzu_1emu_utils_NativeConfig_setCustomOverlayActive(JNIEnv* env, jobject obj,
+                                                                       jboolean jactive) {
+    AndroidSettings::values.use_custom_overlay = static_cast<bool>(jactive);
 }
 
 jobjectArray Java_org_yuzu_yuzu_1emu_utils_NativeConfig_getInputSettings(JNIEnv* env, jobject obj,
