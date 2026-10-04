@@ -2,7 +2,7 @@ name: Build Android APK
 
 on:
   push:
-    branches: [master]
+    branches: [master, test]
     paths:
       - 'src/**'
       - 'externals/**'
@@ -81,6 +81,11 @@ jobs:
         with:
           key: android-standard-Release
           max-size: 2G
+
+      - name: Clean Gradle / Kotlin build state
+        run: |
+          rm -rf ~/.gradle/caches/build-cache-1 || true
+          find . -type d \( -name build -o -name .cxx -o -name .gradle \) -prune -exec rm -rf {} + || true
 
       - name: Build
         env:

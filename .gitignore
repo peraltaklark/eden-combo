@@ -70,4 +70,3 @@ externals/generated
 # Local backups
 src/android/app/src/main/java/org/yuzu/yuzu_emu/overlay/*.bak
 *.ovprofile.bak
-*.ovprofile.bak
