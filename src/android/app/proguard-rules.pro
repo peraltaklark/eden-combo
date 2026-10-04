@@ -25,3 +25,6 @@
 -dontwarn java.beans.Introspector
 -dontwarn java.beans.VetoableChangeListener
 -dontwarn java.beans.VetoableChangeSupport
+
+# Native code builds and reads OverlayControlData through JNI (id_cache.cpp).
+-keep class org.yuzu.yuzu_emu.overlay.model.OverlayControlData { *; }
