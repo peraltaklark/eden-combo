@@ -1,0 +1,88 @@
+From ef7cde0c2b1c05158383ed6dfd127bd2e0dc5118 Mon Sep 17 00:00:00 2001
+From: CamilleLaVey <camillelavey99@gmail.com>
+Date: Sun, 27 Sep 2026 02:48:26 -0400
+Subject: [PATCH] Barrier feedback loops toggle android
+
+---
+ .../yuzu_emu/features/settings/model/BooleanSetting.kt   | 1 +
+ .../features/settings/model/view/SettingsItem.kt         | 7 +++++++
+ .../features/settings/ui/SettingsFragmentPresenter.kt    | 1 +
+ src/android/app/src/main/res/values/strings.xml          | 2 ++
+ src/common/settings.h                                    | 9 +++++++--
+ 5 files changed, 18 insertions(+), 2 deletions(-)
+
+diff --git a/src/android/app/src/main/java/org/yuzu/yuzu_emu/features/settings/model/BooleanSetting.kt b/src/android/app/src/main/java/org/yuzu/yuzu_emu/features/settings/model/BooleanSetting.kt
+index 63747cd241..4b3648d4e3 100644
+--- a/src/android/app/src/main/java/org/yuzu/yuzu_emu/features/settings/model/BooleanSetting.kt
++++ b/src/android/app/src/main/java/org/yuzu/yuzu_emu/features/settings/model/BooleanSetting.kt
+@@ -27,6 +27,7 @@ enum class BooleanSetting(override val key: String) : AbstractBooleanSetting {
+     RENDERER_ASYNCHRONOUS_GPU_EMULATION("use_asynchronous_gpu_emulation"),
+     RENDERER_ASYNCHRONOUS_SHADERS("use_asynchronous_shaders"),
+     RENDERER_REACTIVE_FLUSHING("use_reactive_flushing"),
++    RENDERER_BARRIER_FEEDBACK_LOOPS("barrier_feedback_loops"),
+     ENABLE_BUFFER_HISTORY("enable_buffer_history"),
+     USE_OPTIMIZED_VERTEX_BUFFERS("use_optimized_vertex_buffers"),
+     ENABLE_GPU_BUFFER_READBACK("enable_gpu_buffer_readback"),
+diff --git a/src/android/app/src/main/java/org/yuzu/yuzu_emu/features/settings/model/view/SettingsItem.kt b/src/android/app/src/main/java/org/yuzu/yuzu_emu/features/settings/model/view/SettingsItem.kt
+index b6b42c366c..d04ce0567f 100644
+--- a/src/android/app/src/main/java/org/yuzu/yuzu_emu/features/settings/model/view/SettingsItem.kt
++++ b/src/android/app/src/main/java/org/yuzu/yuzu_emu/features/settings/model/view/SettingsItem.kt
+@@ -853,6 +853,13 @@ abstract class SettingsItem(
+                     descriptionId = R.string.renderer_reactive_flushing_description
+                 )
+             )
++            put(
++                SwitchSetting(
++                    BooleanSetting.RENDERER_BARRIER_FEEDBACK_LOOPS,
++                    titleId = R.string.renderer_barrier_feedback_loops,
++                    descriptionId = R.string.renderer_barrier_feedback_loops_description
++                )
++            )
+             put(
+                 SwitchSetting(
+                     BooleanSetting.ENABLE_BUFFER_HISTORY,
+diff --git a/src/android/app/src/main/java/org/yuzu/yuzu_emu/features/settings/ui/SettingsFragmentPresenter.kt b/src/android/app/src/main/java/org/yuzu/yuzu_emu/features/settings/ui/SettingsFragmentPresenter.kt
+index 4cfa885fb4..060d0dae3b 100644
+--- a/src/android/app/src/main/java/org/yuzu/yuzu_emu/features/settings/ui/SettingsFragmentPresenter.kt
++++ b/src/android/app/src/main/java/org/yuzu/yuzu_emu/features/settings/ui/SettingsFragmentPresenter.kt
+@@ -548,6 +548,7 @@ class SettingsFragmentPresenter(
+             add(BooleanSetting.RENDERER_USE_DISK_SHADER_CACHE.key)
+             add(BooleanSetting.RENDERER_FORCE_MAX_CLOCK.key)
+             add(BooleanSetting.RENDERER_REACTIVE_FLUSHING.key)
++            add(BooleanSetting.RENDERER_BARRIER_FEEDBACK_LOOPS.key)
+             add(BooleanSetting.ENABLE_BUFFER_HISTORY.key)
+             add(BooleanSetting.ENABLE_GPU_BUFFER_READBACK.key)
+             add(BooleanSetting.USE_OPTIMIZED_VERTEX_BUFFERS.key)
+diff --git a/src/android/app/src/main/res/values/strings.xml b/src/android/app/src/main/res/values/strings.xml
+index 025922df8d..2238a9ec4c 100644
+--- a/src/android/app/src/main/res/values/strings.xml
++++ b/src/android/app/src/main/res/values/strings.xml
+@@ -582,6 +582,8 @@
+     <string name="renderer_asynchronous_gpu_emulation_description">This hack can increase performance by running GPU emulation asynchronously at the cost of graphical issues and increased crash rates by timing-related operations.</string>
+     <string name="renderer_reactive_flushing">Use reactive flushing</string>
+     <string name="renderer_reactive_flushing_description">Improves rendering accuracy in some games at the cost of performance.</string>
++    <string name="renderer_barrier_feedback_loops">Barrier feedback loops</string>
++    <string name="renderer_barrier_feedback_loops_description">Improves rendering of transparency effects in specific games at the cost of performance.</string>
+     <string name="enable_buffer_history">Enable buffer history</string>
+     <string name="enable_buffer_history_description">Enables access to previous buffer states. This option may improve rendering quality and performance consistency in some games.</string>
+     <string name="enable_gpu_buffer_readback">Enable GPU Buffer Readback</string>
+diff --git a/src/common/settings.h b/src/common/settings.h
+index 10c5042539..4ca2368064 100644
+--- a/src/common/settings.h
++++ b/src/common/settings.h
+@@ -595,8 +595,13 @@ struct Values {
+                                                   "use_reactive_flushing",
+                                                   Category::RendererAdvanced};
+ 
+-    SwitchableSetting<bool> barrier_feedback_loops{linkage, true, "barrier_feedback_loops",
+-                                                   Category::RendererAdvanced};
++    SwitchableSetting<bool> barrier_feedback_loops{linkage,
++                                                   true,
++                                                   "barrier_feedback_loops",
++                                                   Category::RendererAdvanced,
++                                                   Specialization::Default,
++                                                   true,
++                                                   true};
+ 
+     SwitchableSetting<bool> enable_buffer_history{linkage,
+                                                   false,

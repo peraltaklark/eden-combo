@@ -190,8 +190,9 @@ android {
             isDefault = true
             minSdk = 33
 
-            manifestPlaceholders += mapOf("appNameBase" to "Eden")
-            resValue("string", "app_name_suffixed", "Eden")
+            applicationIdSuffix = ".mod"
+            manifestPlaceholders += mapOf("appNameBase" to "Eden Mod")
+            resValue("string", "app_name_suffixed", "Eden Mod")
 
             ndk {
                 abiFilters += listOf("arm64-v8a")
@@ -219,9 +220,10 @@ android {
         create("legacy") {
             dimension = "version"
             minSdk = 29
-            manifestPlaceholders += mapOf("appNameBase" to "Eden Legacy")
-            resValue("string", "app_name_suffixed", "Eden Legacy")
+            manifestPlaceholders += mapOf("appNameBase" to "Eden Legacy Mod")
+            resValue("string", "app_name_suffixed", "Eden Legacy Mod")
             applicationId = "dev.legacy.eden_emulator"
+            applicationIdSuffix = ".mod"
 
             externalNativeBuild {
                 cmake {
@@ -270,7 +272,7 @@ android {
 
         // apply nightly suffix I/A
         resValue("string", "app_name_suffixed", "$currentName$suffix")
-        resValue("string", "app_name", "Eden$suffix")
+        resValue("string", "app_name", "Eden Mod$suffix")
     }
 
     sourceSets {

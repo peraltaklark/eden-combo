@@ -1,0 +1,107 @@
+diff --git a/src/android/app/build.gradle.kts b/src/android/app/build.gradle.kts
+--- a/src/android/app/build.gradle.kts	2026-10-05 15:37:33.791357948 +0000
++++ b/src/android/app/build.gradle.kts	2026-10-05 15:38:53.339019460 +0000
+@@ -190,8 +190,9 @@
+             isDefault = true
+             minSdk = 33
+ 
+-            manifestPlaceholders += mapOf("appNameBase" to "Eden")
+-            resValue("string", "app_name_suffixed", "Eden")
++            applicationIdSuffix = ".mod"
++            manifestPlaceholders += mapOf("appNameBase" to "Eden Mod")
++            resValue("string", "app_name_suffixed", "Eden Mod")
+ 
+             ndk {
+                 abiFilters += listOf("arm64-v8a")
+@@ -219,9 +220,10 @@
+         create("legacy") {
+             dimension = "version"
+             minSdk = 29
+-            manifestPlaceholders += mapOf("appNameBase" to "Eden Legacy")
+-            resValue("string", "app_name_suffixed", "Eden Legacy")
++            manifestPlaceholders += mapOf("appNameBase" to "Eden Legacy Mod")
++            resValue("string", "app_name_suffixed", "Eden Legacy Mod")
+             applicationId = "dev.legacy.eden_emulator"
++            applicationIdSuffix = ".mod"
+ 
+             externalNativeBuild {
+                 cmake {
+@@ -270,7 +272,7 @@
+ 
+         // apply nightly suffix I/A
+         resValue("string", "app_name_suffixed", "$currentName$suffix")
+-        resValue("string", "app_name", "Eden$suffix")
++        resValue("string", "app_name", "Eden Mod$suffix")
+     }
+ 
+     sourceSets {
+diff --git a/src/android/app/src/main/java/org/yuzu/yuzu_emu/features/settings/model/BooleanSetting.kt b/src/android/app/src/main/java/org/yuzu/yuzu_emu/features/settings/model/BooleanSetting.kt
+--- a/src/android/app/src/main/java/org/yuzu/yuzu_emu/features/settings/model/BooleanSetting.kt	2026-10-05 15:37:33.793106974 +0000
++++ b/src/android/app/src/main/java/org/yuzu/yuzu_emu/features/settings/model/BooleanSetting.kt	2026-10-05 15:37:33.980287151 +0000
+@@ -28,6 +28,7 @@
+     RENDERER_ASYNC_PRESENTATION("async_presentation"),
+     RENDERER_ASYNCHRONOUS_SHADERS("use_asynchronous_shaders"),
+     RENDERER_REACTIVE_FLUSHING("use_reactive_flushing"),
++    RENDERER_BARRIER_FEEDBACK_LOOPS("barrier_feedback_loops"),
+     ENABLE_BUFFER_HISTORY("enable_buffer_history"),
+     USE_OPTIMIZED_VERTEX_BUFFERS("use_optimized_vertex_buffers"),
+     SYNC_MEMORY_OPERATIONS("sync_memory_operations"),
+diff --git a/src/android/app/src/main/java/org/yuzu/yuzu_emu/features/settings/model/view/SettingsItem.kt b/src/android/app/src/main/java/org/yuzu/yuzu_emu/features/settings/model/view/SettingsItem.kt
+--- a/src/android/app/src/main/java/org/yuzu/yuzu_emu/features/settings/model/view/SettingsItem.kt	2026-10-05 15:37:33.793674113 +0000
++++ b/src/android/app/src/main/java/org/yuzu/yuzu_emu/features/settings/model/view/SettingsItem.kt	2026-10-05 15:37:38.750047747 +0000
+@@ -903,6 +903,13 @@
+             )
+             put(
+                 SwitchSetting(
++                    BooleanSetting.RENDERER_BARRIER_FEEDBACK_LOOPS,
++                    titleId = R.string.renderer_barrier_feedback_loops,
++                    descriptionId = R.string.renderer_barrier_feedback_loops_description
++                )
++            )
++            put(
++                SwitchSetting(
+                     BooleanSetting.ENABLE_BUFFER_HISTORY,
+                     titleId = R.string.enable_buffer_history,
+                     descriptionId = R.string.enable_buffer_history_description
+diff --git a/src/android/app/src/main/java/org/yuzu/yuzu_emu/features/settings/ui/SettingsFragmentPresenter.kt b/src/android/app/src/main/java/org/yuzu/yuzu_emu/features/settings/ui/SettingsFragmentPresenter.kt
+--- a/src/android/app/src/main/java/org/yuzu/yuzu_emu/features/settings/ui/SettingsFragmentPresenter.kt	2026-10-05 15:37:33.794153759 +0000
++++ b/src/android/app/src/main/java/org/yuzu/yuzu_emu/features/settings/ui/SettingsFragmentPresenter.kt	2026-10-05 15:37:33.981294666 +0000
+@@ -557,6 +557,7 @@
+             add(BooleanSetting.RENDERER_USE_DISK_SHADER_CACHE.key)
+             add(BooleanSetting.RENDERER_FORCE_MAX_CLOCK.key)
+             add(BooleanSetting.RENDERER_REACTIVE_FLUSHING.key)
++            add(BooleanSetting.RENDERER_BARRIER_FEEDBACK_LOOPS.key)
+             add(BooleanSetting.ENABLE_BUFFER_HISTORY.key)
+             add(BooleanSetting.USE_OPTIMIZED_VERTEX_BUFFERS.key)
+ 
+diff --git a/src/android/app/src/main/res/values/strings.xml b/src/android/app/src/main/res/values/strings.xml
+--- a/src/android/app/src/main/res/values/strings.xml	2026-10-05 15:37:33.808749053 +0000
++++ b/src/android/app/src/main/res/values/strings.xml	2026-10-05 15:37:33.982990769 +0000
+@@ -592,6 +592,8 @@
+     <string name="renderer_async_presentation_description">This hack can increase performance by moving presentation to a separate CPU thread at the cost of graphical issues.</string>
+     <string name="renderer_reactive_flushing">Use reactive flushing</string>
+     <string name="renderer_reactive_flushing_description">Improves rendering accuracy in some games at the cost of performance.</string>
++    <string name="renderer_barrier_feedback_loops">Barrier feedback loops</string>
++    <string name="renderer_barrier_feedback_loops_description">Improves rendering of transparency effects in specific games at the cost of performance.</string>
+     <string name="enable_buffer_history">Enable buffer history</string>
+     <string name="enable_buffer_history_description">Enables access to previous buffer states. This option may improve rendering quality and performance consistency in some games.</string>
+     <string name="use_optimized_vertex_buffers">Optimized Vertex Buffers</string>
+diff --git a/src/common/settings.h b/src/common/settings.h
+--- a/src/common/settings.h	2026-10-05 15:37:33.819290489 +0000
++++ b/src/common/settings.h	2026-10-05 15:37:33.983593994 +0000
+@@ -602,8 +602,13 @@
+                                                   "use_reactive_flushing",
+                                                   Category::RendererAdvanced};
+ 
+-    SwitchableSetting<bool> barrier_feedback_loops{linkage, true, "barrier_feedback_loops",
+-                                                   Category::RendererAdvanced};
++    SwitchableSetting<bool> barrier_feedback_loops{linkage,
++                                                   true,
++                                                   "barrier_feedback_loops",
++                                                   Category::RendererAdvanced,
++                                                   Specialization::Default,
++                                                   true,
++                                                   true};
+ 
+     SwitchableSetting<bool> enable_buffer_history{linkage,
+                                                   false,
