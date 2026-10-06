@@ -188,7 +188,7 @@ android {
         create("mainline") {
             dimension = "version"
             isDefault = true
-            minSdk = 33
+            minSdk = 30
 
             applicationIdSuffix = ".mod"
             manifestPlaceholders += mapOf("appNameBase" to "Eden Mod")

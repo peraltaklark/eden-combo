@@ -89,8 +89,8 @@ jobs:
 
       - name: Build
         env:
-          FLAVOR: standard
-          TYPE: Release
+          FLAVOR: ${{ github.event.inputs.flavor || 'standard' }}
+          TYPE: ${{ github.event.inputs.build_type || 'Release' }}
           CCACHE: 'false'
           GIT_TAG_NAME: ${{ github.ref_name }}
           ANDROID_KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
